@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">UnlockScreen</string>
+    <string name="add_widget">Add widget</string>
+
+    <plurals name="numberUnlocks">
+        <item quantity="zero">%d times</item>
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d times</item>
+    </plurals>
+</resources>
