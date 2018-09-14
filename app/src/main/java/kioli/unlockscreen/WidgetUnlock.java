@@ -4,9 +4,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.widget.RemoteViews;
@@ -20,6 +22,19 @@ public class WidgetUnlock extends AppWidgetProvider {
 	private static final String ACTION_NEW_DAY = "newDay";
 	private static final long INTERVAL = 24 * 60 * 60 * 1000L;
 	
+	private IntentFilter intentFilter = new IntentFilter(Intent.ACTION_USER_PRESENT);
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(final Context context, final Intent intent) {
+			if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
+				int value = updateUnlocks(context);
+				showText(context, value);
+			} else if (ACTION_NEW_DAY.equals(intent.getAction())) {
+				int value = resetNumLocks(context);
+				showText(context, value);
+			}
+		}
+	};
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -28,12 +43,7 @@ public class WidgetUnlock extends AppWidgetProvider {
 			if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
 				setInitial(context);
 			}
-		} else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
-			int value = updateUnlocks(context);
-			showText(context, value);
-		} else if (ACTION_NEW_DAY.equals(intent.getAction())) {
-			int value = resetNumLocks(context);
-			showText(context, value);
+			context.getApplicationContext().registerReceiver(receiver, intentFilter);
 		}
 	}
 	
